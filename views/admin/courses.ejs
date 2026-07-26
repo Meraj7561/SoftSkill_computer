@@ -1,0 +1,147 @@
+<%- include('../partials/admin-header') %>
+
+<% if (notice) { %>
+    <div class="alert alert-<%= noticeType %>"><%= notice %></div>
+<% } %>
+
+<div class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div class="tabs" style="margin-bottom:0;">
+            <a href="/admin/courses?cat=all" class="<%= activeCategory === 'all' ? 'active' : '' %>">All</a>
+            <% Object.keys(categories).forEach(function(key) { %>
+                <a href="/admin/courses?cat=<%= key %>" class="<%= activeCategory === key ? 'active' : '' %>"><%= categories[key] %></a>
+            <% }) %>
+        </div>
+        <button class="btn" onclick="openAddModal()">+ Add Course</button>
+    </div>
+</div>
+
+<div class="panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Featured</th>
+                <th>Status</th>
+                <th>Order</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <% if (courses.length === 0) { %>
+            <tr><td colspan="8">No courses found.</td></tr>
+        <% } else { courses.forEach(function(c) { %>
+            <tr>
+                <td><%= categories[c.category] || c.category %></td>
+                <td><%= c.course_code %></td>
+                <td><%= c.course_name %></td>
+                <td><%= c.duration %></td>
+                <td><%- c.is_featured ? '<span class="badge badge-featured">Featured</span>' : '-' %></td>
+                <td><%- c.status ? '<span class="badge badge-normal">Visible</span>' : '<span class="badge badge-unread">Hidden</span>' %></td>
+                <td><%= c.sort_order %></td>
+                <td class="actions-cell">
+                    <button class="btn btn-sm btn-secondary"
+                        onclick='openEditModal(<%- JSON.stringify(c) %>)'>Edit</button>
+                    <a class="btn btn-sm btn-danger" href="/admin/courses/delete/<%= c.id %>"
+                       onclick="return confirm('Delete this course? This cannot be undone.');">Delete</a>
+                </td>
+            </tr>
+        <% }) } %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-backdrop" id="courseModal">
+    <div class="modal">
+        <h3 id="modalTitle">Add Course</h3>
+        <form method="POST" action="/admin/courses/save">
+            <input type="hidden" name="id" id="f_id" value="0">
+            <input type="hidden" name="cat" value="<%= activeCategory %>">
+
+            <label>Category</label>
+            <select name="category" id="f_category" required>
+                <% Object.keys(categories).forEach(function(key) { %>
+                    <option value="<%= key %>"><%= categories[key] %></option>
+                <% }) %>
+            </select>
+
+            <div class="form-row">
+                <div>
+                    <label>Course Code</label>
+                    <input type="text" name="course_code" id="f_code" placeholder="e.g. DCA">
+                </div>
+                <div>
+                    <label>Duration</label>
+                    <input type="text" name="duration" id="f_duration" placeholder="e.g. 6 Months">
+                </div>
+            </div>
+
+            <label>Course Name</label>
+            <input type="text" name="course_name" id="f_name" required placeholder="e.g. Diploma in Computer Application (DCA)">
+
+            <label>Short Description</label>
+            <textarea name="description" id="f_description" rows="2" placeholder="One line description shown on the course card"></textarea>
+
+            <div class="form-row">
+                <div>
+                    <label>Sort Order</label>
+                    <input type="number" name="sort_order" id="f_sort" value="0">
+                </div>
+            </div>
+
+            <div class="checkbox-row">
+                <input type="checkbox" name="is_featured" id="f_featured">
+                <label style="margin:0;">Mark as Featured</label>
+            </div>
+            <div class="checkbox-row">
+                <input type="checkbox" name="status" id="f_status" checked>
+                <label style="margin:0;">Visible on website</label>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button type="submit" class="btn">Save Course</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAddModal() {
+    document.getElementById('modalTitle').textContent = 'Add Course';
+    document.getElementById('f_id').value = 0;
+    document.getElementById('f_category').value = 'computer';
+    document.getElementById('f_code').value = '';
+    document.getElementById('f_duration').value = '';
+    document.getElementById('f_name').value = '';
+    document.getElementById('f_description').value = '';
+    document.getElementById('f_sort').value = 0;
+    document.getElementById('f_featured').checked = false;
+    document.getElementById('f_status').checked = true;
+    document.getElementById('courseModal').classList.add('open');
+}
+
+function openEditModal(course) {
+    document.getElementById('modalTitle').textContent = 'Edit Course';
+    document.getElementById('f_id').value = course.id;
+    document.getElementById('f_category').value = course.category;
+    document.getElementById('f_code').value = course.course_code || '';
+    document.getElementById('f_duration').value = course.duration || '';
+    document.getElementById('f_name').value = course.course_name || '';
+    document.getElementById('f_description').value = course.description || '';
+    document.getElementById('f_sort').value = course.sort_order || 0;
+    document.getElementById('f_featured').checked = course.is_featured == 1;
+    document.getElementById('f_status').checked = course.status == 1;
+    document.getElementById('courseModal').classList.add('open');
+}
+
+function closeModal() {
+    document.getElementById('courseModal').classList.remove('open');
+}
+</script>
+
+<%- include('../partials/admin-footer') %>

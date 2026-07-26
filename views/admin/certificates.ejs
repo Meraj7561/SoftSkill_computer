@@ -1,0 +1,117 @@
+<%- include('../partials/admin-header') %>
+
+<% if (notice) { %>
+    <div class="alert alert-<%= noticeType %>"><%= notice %></div>
+<% } %>
+
+<div class="panel">
+    <h2>Upload Certificate Data (Excel / CSV)</h2>
+    <p class="help-text" style="margin-top:0;">
+        The file's first row must be a header row. Supported column names (any order, case-insensitive):
+        <code>roll_no, student_name, course_name, duration, grade, issue_date, father_name, extra_info</code>.
+        Uploading a roll number that already exists will update that record instead of duplicating it.
+    </p>
+    <form method="POST" action="/admin/certificates/upload" enctype="multipart/form-data" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+        <div style="flex:1; min-width:240px;">
+            <label>Excel (.xlsx) or CSV file</label>
+            <input type="file" name="cert_file" accept=".xlsx,.csv" required>
+        </div>
+        <div>
+            <button type="submit" class="btn">Upload & Import</button>
+        </div>
+    </form>
+</div>
+
+<div class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <form method="GET" style="display:flex; gap:8px;">
+            <input type="text" name="search" placeholder="Search by roll no or name" value="<%= search %>" style="margin-bottom:0; min-width:240px;">
+            <button type="submit" class="btn btn-secondary">Search</button>
+        </form>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <a href="/admin/certificates?action=add" class="btn btn-primary btn-sm">Add Student</a>
+            <a href="/admin/certificates/clear-all" class="btn btn-danger btn-sm"
+               onclick="return confirm('This will delete ALL certificate records. Continue?');">Clear All Records</a>
+        </div>
+    </div>
+
+    <% if (formMode) { %>
+    <div class="panel" style="margin-bottom: 24px;">
+        <h3><%= formMode === 'edit' ? 'Edit Certificate Record' : 'Add New Certificate Record' %></h3>
+        <form method="POST" action="/admin/certificates/save" style="display:grid; gap:16px;">
+            <input type="hidden" name="id" value="<%= certificateFormRecord.id %>">
+            <div class="form-group">
+                <label>Roll Number</label>
+                <input type="text" name="roll_no" value="<%= certificateFormRecord.roll_no %>" required>
+            </div>
+            <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" name="student_name" value="<%= certificateFormRecord.student_name %>" required>
+            </div>
+            <div class="form-group">
+                <label>Course Name</label>
+                <input type="text" name="course_name" value="<%= certificateFormRecord.course_name %>">
+            </div>
+            <div class="form-group">
+                <label>Duration</label>
+                <input type="text" name="duration" value="<%= certificateFormRecord.duration %>">
+            </div>
+            <div class="form-group">
+                <label>Grade</label>
+                <input type="text" name="grade" value="<%= certificateFormRecord.grade %>">
+            </div>
+            <div class="form-group">
+                <label>Issue Date</label>
+                <input type="text" name="issue_date" value="<%= certificateFormRecord.issue_date %>">
+            </div>
+            <div class="form-group">
+                <label>Father's Name</label>
+                <input type="text" name="father_name" value="<%= certificateFormRecord.father_name %>">
+            </div>
+            <div class="form-group">
+                <label>Extra Info</label>
+                <textarea name="extra_info" rows="3"><%= certificateFormRecord.extra_info %></textarea>
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <button type="submit" class="btn btn-primary">Save Certificate</button>
+                <a href="/admin/certificates" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <% } %>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Duration</th>
+                <th>Grade</th>
+                <th>Issue Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <% if (records.length === 0) { %>
+            <tr><td colspan="7">No certificate records found. Upload an Excel/CSV file above.</td></tr>
+        <% } else { records.forEach(function(r) { %>
+            <tr>
+                <td><%= r.roll_no %></td>
+                <td><%= r.student_name %></td>
+                <td><%= r.course_name %></td>
+                <td><%= r.duration %></td>
+                <td><%= r.grade %></td>
+                <td><%= r.issue_date %></td>
+                <td>
+                    <a class="btn btn-sm btn-secondary" href="/admin/certificates?action=edit&id=<%= r.id %>">Edit</a>
+                    <a class="btn btn-sm btn-danger" href="/admin/certificates/delete/<%= r.id %>"
+                       onclick="return confirm('Delete this record?');">Delete</a>
+                </td>
+            </tr>
+        <% }) } %>
+        </tbody>
+    </table>
+</div>
+
+<%- include('../partials/admin-footer') %>
