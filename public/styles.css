@@ -314,8 +314,7 @@ body {
 }
 
 .hero-title {
-    font-size: 56px;
-    font-weight: 800;
+        font-size: 42px;
     line-height: 1.1;
     margin-bottom: 20px;
     display: flex;
@@ -348,7 +347,7 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 64px;
+    font-size: 48px;
 }
 
 .hero-subtitle {
@@ -1158,11 +1157,11 @@ section {
     }
     
     .hero-title {
-        font-size: 42px;
+        font-size: 34px;
     }
     
     .title-highlight {
-        font-size: 48px;
+        font-size: 42px;
     }
     
     .about-content {
@@ -1180,6 +1179,48 @@ section {
     .section-title {
         font-size: 36px;
     }
+}
+
+/* When the hamburger is active, show the mobile nav */
+@media (max-width: 968px) {
+    .nav-links.active {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        position: absolute;
+        top: 68px;
+        left: 0;
+        right: 0;
+        background: rgba(10,14,39,0.98);
+        border-top: 1px solid var(--card-border);
+        padding: 18px 20px 24px;
+        z-index: 1100;
+        text-align: center;
+    }
+
+    .nav-links.active .nav-link {
+        font-size: 18px;
+        padding: 10px 0;
+    }
+
+    .mobile-menu-btn.active span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+    .mobile-menu-btn.active span:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+    .mobile-menu-btn.active span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+}
+
+/* overlay for mobile nav when open */
+.mobile-nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 1000;
 }
 
 @media (max-width: 640px) {
@@ -1217,11 +1258,11 @@ section {
     }
     
     .hero-title {
-        font-size: 32px;
+        font-size: 28px;
     }
     
     .title-highlight {
-        font-size: 36px;
+        font-size: 32px;
     }
     
     .section-title {
