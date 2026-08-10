@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - SoftSkill</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin.css">
+<style>body{font-family:'Outfit',sans-serif;}</style>
+</head>
+<body>
+<div class="login-page">
+    <div class="login-box">
+        <img src="/logo.png" alt="SoftSkill">
+        <h1>Admin Panel Login</h1>
+        <% if (error) { %>
+            <div class="alert alert-error"><%= error %></div>
+        <% } %>
+        <form method="POST" action="/admin/login">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required autofocus>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit" class="btn" style="width:100%;">Login</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

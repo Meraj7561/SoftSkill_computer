@@ -1,0 +1,45 @@
+<%- include('../partials/admin-header') %>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="num"><%= courseCount %></div>
+        <div class="label">Total Courses</div>
+    </div>
+    <div class="stat-card">
+        <div class="num"><%= certCount %></div>
+        <div class="label">Certificates on Record</div>
+    </div>
+    <div class="stat-card">
+        <div class="num"><%= msgCount %></div>
+        <div class="label">Contact Messages</div>
+    </div>
+    <div class="stat-card">
+        <div class="num"><%= unreadCount %></div>
+        <div class="label">Unread Messages</div>
+    </div>
+</div>
+
+<div class="panel">
+    <h2>Recent Contact Messages</h2>
+    <table>
+        <thead>
+            <tr><th>Name</th><th>Phone</th><th>Course</th><th>Received</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+        <% if (recentMessages.length === 0) { %>
+            <tr><td colspan="5">No messages yet.</td></tr>
+        <% } else { recentMessages.forEach(function(m) { %>
+            <tr>
+                <td><%= m.name %></td>
+                <td><%= m.phone %></td>
+                <td><%= m.course || '-' %></td>
+                <td><%= m.created_at %></td>
+                <td><%- m.is_read ? '<span class="badge badge-normal">Read</span>' : '<span class="badge badge-unread">Unread</span>' %></td>
+            </tr>
+        <% }) } %>
+        </tbody>
+    </table>
+    <p style="margin-top:14px;"><a href="/admin/messages">View all messages &rarr;</a></p>
+</div>
+
+<%- include('../partials/admin-footer') %>

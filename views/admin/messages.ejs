@@ -1,0 +1,43 @@
+<%- include('../partials/admin-header') %>
+
+<div class="panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Message</th>
+                <th>Received</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <% if (messages.length === 0) { %>
+            <tr><td colspan="8">No messages received yet.</td></tr>
+        <% } else { messages.forEach(function(m) { %>
+            <tr>
+                <td><%= m.name %></td>
+                <td><%= m.email %></td>
+                <td><%= m.phone %></td>
+                <td><%= m.course || '-' %></td>
+                <td style="max-width:220px; white-space:normal;"><%- (m.message || '-').replace(/\n/g, '<br>') %></td>
+                <td><%= m.created_at %></td>
+                <td><%- m.is_read ? '<span class="badge badge-normal">Read</span>' : '<span class="badge badge-unread">Unread</span>' %></td>
+                <td class="actions-cell">
+                    <a href="https://wa.me/91<%= (m.phone || '').replace(/\D/g, '') %>" target="_blank" class="btn btn-sm btn-secondary">WhatsApp</a>
+                    <% if (!m.is_read) { %>
+                        <a href="/admin/messages/mark-read/<%= m.id %>" class="btn btn-sm btn-secondary">Mark Read</a>
+                    <% } %>
+                    <a href="/admin/messages/delete/<%= m.id %>" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Delete this message?');">Delete</a>
+                </td>
+            </tr>
+        <% }) } %>
+        </tbody>
+    </table>
+</div>
+
+<%- include('../partials/admin-footer') %>
