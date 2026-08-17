@@ -162,9 +162,9 @@ body {
     transform: translateY(-2px);
 }
 
-.social-icon.twitter:hover {
-    background: #1da1f2;
-    border-color: #1da1f2;
+.social-icon.telegram:hover {
+    background: #0088cc;
+    border-color: #0088cc;
     transform: translateY(-2px);
 }
 

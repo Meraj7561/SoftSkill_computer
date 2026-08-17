@@ -74,6 +74,8 @@ Pick one — all have free tiers that work well with Vercel:
 
 Once you have one, import `database.sql` into it (most of these give you a web console or connection string you can use with any MySQL client, e.g. TablePlus, DBeaver, or MySQL Workbench).
 
+> If you do not want to use a remote MySQL database, the app also supports Vercel-side persistence via a remote JSON backend (`jsonblob.com`). In that case, set `DB_HOST=localhost` and `JSONBLOB_ID=019fa08f-1926-73c7-8910-ef35f1496c08` in Vercel.
+
 ---
 
 ## 4. Push to GitHub
@@ -110,6 +112,12 @@ git push -u origin main
    If your database provider requires SSL (most cloud MySQL providers do), also add:
    ```
    DB_SSL=true
+   ```
+
+   If you do not have a remote MySQL database available and want the app to persist data using the fallback remote JSON backend, also add:
+   ```
+   DB_HOST=localhost
+   JSONBLOB_ID=019fa08f-1926-73c7-8910-ef35f1496c08
    ```
 5. Click **Deploy**. Vercel gives you a live URL like `yourapp.vercel.app` within a minute or two.
 6. Visit `yourapp.vercel.app` for the site, and `yourapp.vercel.app/admin/login` for the admin panel.

@@ -1,0 +1,79 @@
+{
+  "admins": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "$2b$10$wUyp5.CPYhH/mGvtep71EODNJfNtbYw0jeAHfff4kqU1MGDhnBqk6",
+      "full_name": "Administrator",
+      "created_at": "2026-07-26 22:32:39"
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "category": "computer",
+      "course_code": "COA",
+      "course_name": "Certificate in Office Automation (COA)",
+      "duration": "3 Months",
+      "description": "Master MS Office suite and essential productivity tools",
+      "is_featured": 0,
+      "sort_order": 1,
+      "status": 1,
+      "created_at": "2026-07-26 22:32:39",
+      "updated_at": "2026-07-26 22:32:39"
+    },
+    {
+      "id": 2,
+      "category": "computer",
+      "course_code": "CFA",
+      "course_name": "Certificate in Financial Accounting (CFA)",
+      "duration": "3 Months",
+      "description": "Learn accounting fundamentals with Tally",
+      "is_featured": 0,
+      "sort_order": 2,
+      "status": 1,
+      "created_at": "2026-07-26 22:32:39",
+      "updated_at": "2026-07-26 22:32:39"
+    },
+    {
+      "id": 3,
+      "category": "computer",
+      "course_code": "TEST",
+      "course_name": "Test Course",
+      "duration": "1 Month",
+      "description": "Test course description",
+      "is_featured": 0,
+      "status": 1,
+      "sort_order": 10,
+      "created_at": "2026-07-26 22:40:14",
+      "updated_at": "2026-07-26 22:40:14"
+    }
+  ],
+  "certificates": [
+    {
+      "id": 1,
+      "roll_no": "SS-001",
+      "student_name": "Test Student",
+      "course_name": "Certificate in Office Automation (COA)",
+      "duration": "3 Months",
+      "grade": "A+",
+      "issue_date": "2026-07-01",
+      "father_name": "Test Father",
+      "extra_info": "Sample certificate record for verification testing.",
+      "uploaded_at": "2026-07-26 22:32:39",
+      "updated_at": "2026-07-26 22:32:39"
+    }
+  ],
+  "contact_messages": [
+    {
+      "id": 1,
+      "name": "BatchTester",
+      "email": "batch@example.com",
+      "phone": "0000000000",
+      "course": "TEST",
+      "message": "Batch save check",
+      "is_read": 0,
+      "created_at": "2026-07-26 22:50:49"
+    }
+  ]
+}

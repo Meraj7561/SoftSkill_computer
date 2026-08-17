@@ -19,6 +19,18 @@
     </div>
 </div>
 
+<% if (notice) { %>
+    <div class="alert alert-<%= noticeType %>"><%= notice %></div>
+<% } %>
+
+<div class="panel">
+    <h2>Announcement Scroller</h2>
+    <form method="POST" action="/admin/announcement">
+        <textarea name="announcement" rows="4" style="width:100%; padding:12px; border:1px solid #d1d5db; border-radius:8px;"><%= announcement %></textarea>
+        <button type="submit" class="btn" style="margin-top:12px;">Save Announcement</button>
+    </form>
+</div>
+
 <div class="panel">
     <h2>Recent Contact Messages</h2>
     <table>

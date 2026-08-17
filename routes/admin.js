@@ -63,6 +63,45 @@ router.get('/logout', (req, res) => {
 // Everything below this line requires login
 router.use(requireAuth);
 
+const DEFAULT_ANNOUNCEMENT = 'New batch starting soon! Limited seats available • Enroll now and get 20% discount • 100% Job Assistance guaranteed.';
+
+async function ensureSettingsTable() {
+    if (pool.__jsonFallback) return;
+    await pool.query(`CREATE TABLE IF NOT EXISTS settings (
+        setting_key VARCHAR(128) PRIMARY KEY,
+        value TEXT
+    )`);
+}
+
+async function loadAnnouncement() {
+    let announcement = DEFAULT_ANNOUNCEMENT;
+    try {
+        if (!pool.__jsonFallback) await ensureSettingsTable();
+        const [rows] = await pool.query('SELECT value FROM settings WHERE setting_key = ? LIMIT 1', ['announcement']);
+        const row = Array.isArray(rows) ? rows[0] : rows;
+        if (row && row.value) announcement = row.value;
+    } catch (err) {
+        console.error('Announcement load error:', err);
+    }
+    return announcement;
+}
+
+async function saveAnnouncement(value) {
+    try {
+        if (!pool.__jsonFallback) await ensureSettingsTable();
+        const [rows] = await pool.query('SELECT value FROM settings WHERE setting_key = ? LIMIT 1', ['announcement']);
+        const existing = Array.isArray(rows) ? rows[0] : rows;
+        if (existing && existing.value !== undefined) {
+            await pool.query('UPDATE settings SET value = ? WHERE setting_key = ?', [value, 'announcement']);
+        } else {
+            await pool.query('INSERT INTO settings (setting_key, value) VALUES (?, ?)', ['announcement', value]);
+        }
+    } catch (err) {
+        console.error('Announcement save error:', err);
+        throw err;
+    }
+}
+
 // ---------------------------------------------------------------------
 // Dashboard
 // ---------------------------------------------------------------------
@@ -73,6 +112,9 @@ router.get('/dashboard', async (req, res) => {
         const [[{ c: msgCount }]] = await pool.query('SELECT COUNT(*) c FROM contact_messages');
         const [[{ c: unreadCount }]] = await pool.query('SELECT COUNT(*) c FROM contact_messages WHERE is_read = 0');
         const [recentMessages] = await pool.query('SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 5');
+        const announcement = await loadAnnouncement();
+        const notice = req.query.notice || '';
+        const noticeType = req.query.noticeType || 'success';
 
         res.render('admin/dashboard', {
             admin: req.admin,
@@ -83,10 +125,23 @@ router.get('/dashboard', async (req, res) => {
             msgCount,
             unreadCount,
             recentMessages,
+            announcement,
+            notice,
+            noticeType,
         });
     } catch (err) {
         console.error('Dashboard error:', err);
         res.status(500).send('Something went wrong loading the dashboard.');
+    }
+});
+
+router.post('/announcement', async (req, res) => {
+    const announcement = (req.body.announcement || DEFAULT_ANNOUNCEMENT).trim();
+    try {
+        await saveAnnouncement(announcement);
+        res.redirect('/admin/dashboard?notice=' + encodeURIComponent('Announcement updated successfully.') + '&noticeType=success');
+    } catch (err) {
+        res.redirect('/admin/dashboard?notice=' + encodeURIComponent('Failed to update announcement.') + '&noticeType=error');
     }
 });
 
@@ -415,6 +470,7 @@ router.post('/change-password', async (req, res) => {
         const match = rows.length && (await bcrypt.compare(current_password || '', rows[0].password));
 
         if (!match) {
+            
             notice = 'Current password is incorrect.';
             noticeType = 'error';
         } else if (!new_password || new_password.length < 6) {

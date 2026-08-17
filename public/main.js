@@ -118,6 +118,18 @@ if (verifyForm) {
     });
 }
 
+const verifySampleBtn = document.getElementById('verifySampleBtn');
+
+if (verifySampleBtn && verifyForm) {
+    verifySampleBtn.addEventListener('click', () => {
+        const rollInput = document.getElementById('verifyRollNo');
+        if (rollInput) {
+            rollInput.value = 'SS-001';
+            verifyForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
+    });
+}
+
 function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str ?? '';

@@ -17,6 +17,7 @@ const defaultData = () => ({
   courses: [],
   certificates: [],
   contact_messages: [],
+  settings: [],
 });
 
 const seedData = (data) => {
@@ -24,6 +25,7 @@ const seedData = (data) => {
   data.courses = Array.isArray(data.courses) ? data.courses : [];
   data.certificates = Array.isArray(data.certificates) ? data.certificates : [];
   data.contact_messages = Array.isArray(data.contact_messages) ? data.contact_messages : [];
+  data.settings = Array.isArray(data.settings) ? data.settings : [];
 
   if (data.admins.length === 0) {
     data.admins.push({
@@ -430,6 +432,34 @@ if (useJsonFallback) {
     if (normalized.startsWith('select * from contact_messages order by created_at desc')) {
       const rows = [...data.contact_messages].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
       return [rows, []];
+    }
+
+    if (normalized.startsWith('select value from settings where setting_key = ? limit 1')) {
+      const row = data.settings.find((setting) => setting.setting_key === values[0]);
+      return [[row ? { value: row.value } : []], []];
+    }
+
+    if (normalized.startsWith('update settings set value = ? where setting_key = ?')) {
+      await ensureFreshState();
+      const row = data.settings.find((setting) => setting.setting_key === values[1]);
+      if (row) {
+        row.value = values[0];
+        await saveData(data);
+        return [{ affectedRows: 1 }, []];
+      }
+      return [{ affectedRows: 0 }, []];
+    }
+
+    if (normalized.startsWith('insert into settings (setting_key, value) values')) {
+      await ensureFreshState();
+      const existing = data.settings.find((setting) => setting.setting_key === values[0]);
+      if (existing) {
+        existing.value = values[1];
+      } else {
+        data.settings.push({ setting_key: values[0], value: values[1] });
+      }
+      await saveData(data);
+      return [{ insertId: data.settings.length, affectedRows: 1 }, []];
     }
 
     if (normalized.startsWith('insert into contact_messages')) {

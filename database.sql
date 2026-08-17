@@ -87,3 +87,9 @@ CREATE TABLE IF NOT EXISTS contact_messages (
     is_read TINYINT(1) DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
+-- Settings table for admin-managed content such as announcement scroller text
+CREATE TABLE IF NOT EXISTS settings (
+    setting_key VARCHAR(128) PRIMARY KEY,
+    value TEXT
+) ENGINE=InnoDB;
