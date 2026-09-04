@@ -20,6 +20,24 @@ console.log('---------------------------------------');
 
 const app = express();
 
+const allowedOrigins = (process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+app.use((req, res, next) => {
+    const requestOrigin = req.headers.origin;
+    if (requestOrigin && (allowedOrigins.length === 0 || allowedOrigins.includes(requestOrigin))) {
+        res.setHeader('Access-Control-Allow-Origin', requestOrigin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Vary', 'Origin');
+    }
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+    next();
+});
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 

@@ -2,6 +2,9 @@
 // Contact Form -> saves to database via /api/contact, then
 // automatically opens WhatsApp with the enquiry pre-filled.
 // =====================================================================
+const apiBaseUrl = (window.SOFTSKILL_API_URL || '').replace(/\/$/, '');
+const apiUrl = (path) => `${apiBaseUrl}${path}`;
+
 const contactForm = document.getElementById('contactForm');
 const contactFormMsg = document.getElementById('contactFormMsg');
 
@@ -23,7 +26,7 @@ if (contactForm) {
                 urlParams.append(key, value);
             }
 
-            const response = await fetch('/api/contact', {
+            const response = await fetch(apiUrl('/api/contact'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
@@ -82,7 +85,7 @@ if (verifyForm) {
         verifyResult.innerHTML = '<p style="color:#D4FF00; margin-bottom:16px;">Checking certificate details...</p>';
 
         try {
-            const response = await fetch('/api/verify-certificate?roll_no=' + encodeURIComponent(rollNo));
+            const response = await fetch(apiUrl('/api/verify-certificate?roll_no=' + encodeURIComponent(rollNo)));
             const result = await response.json();
 
             if (result.success) {

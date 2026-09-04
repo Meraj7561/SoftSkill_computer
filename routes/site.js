@@ -44,7 +44,12 @@ router.get('/', async (req, res) => {
         }
 
         const announcement = await getAnnouncement();
-        res.render('index', { coursesByCategory, renderCourseCards, announcement });
+        res.render('index', {
+            coursesByCategory,
+            renderCourseCards,
+            announcement,
+            apiBaseUrl: process.env.PUBLIC_API_URL || '',
+        });
     } catch (err) {
         console.error('Homepage error:', err && err.stack ? err.stack : err, 'db.__jsonFallback=', pool && pool.__jsonFallback);
         res.status(500).send('Something went wrong loading the page. Please check the database connection.');
