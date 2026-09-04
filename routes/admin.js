@@ -317,6 +317,7 @@ router.post('/certificates/upload', upload.single('cert_file'), async (req, res)
         const headers = rows[0].map((h) => String(h).trim().toLowerCase());
         let inserted = 0;
         let skipped = 0;
+        const recordsToSave = [];
 
         for (let i = 1; i < rows.length; i++) {
             const rawRow = rows[i];
@@ -340,20 +341,37 @@ router.post('/certificates/upload', upload.single('cert_file'), async (req, res)
             const fatherName = pick(record, ['father_name', "father's name", 'father name']);
             const extraInfo = pick(record, ['extra_info', 'remarks']);
 
-            await pool.query(
-                `INSERT INTO certificates (roll_no, student_name, course_name, duration, grade, issue_date, father_name, extra_info)
-                 VALUES (?,?,?,?,?,?,?,?)
-                 ON DUPLICATE KEY UPDATE
-                    student_name = VALUES(student_name),
-                    course_name  = VALUES(course_name),
-                    duration     = VALUES(duration),
-                    grade        = VALUES(grade),
-                    issue_date   = VALUES(issue_date),
-                    father_name  = VALUES(father_name),
-                    extra_info   = VALUES(extra_info)`,
-                [rollNo, studentName, courseName, duration, grade, issueDate, fatherName, extraInfo]
-            );
-            inserted++;
+            recordsToSave.push({
+                roll_no: rollNo,
+                student_name: studentName,
+                course_name: courseName,
+                duration,
+                grade,
+                issue_date: issueDate,
+                father_name: fatherName,
+                extra_info: extraInfo,
+            });
+        }
+
+        if (pool.__jsonFallback && typeof pool.bulkUpsertCertificates === 'function') {
+            inserted = await pool.bulkUpsertCertificates(recordsToSave);
+        } else {
+            for (const record of recordsToSave) {
+                await pool.query(
+                    `INSERT INTO certificates (roll_no, student_name, course_name, duration, grade, issue_date, father_name, extra_info)
+                     VALUES (?,?,?,?,?,?,?,?)
+                     ON DUPLICATE KEY UPDATE
+                        student_name = VALUES(student_name),
+                        course_name  = VALUES(course_name),
+                        duration     = VALUES(duration),
+                        grade        = VALUES(grade),
+                        issue_date   = VALUES(issue_date),
+                        father_name  = VALUES(father_name),
+                        extra_info   = VALUES(extra_info)`,
+                    [record.roll_no, record.student_name, record.course_name, record.duration, record.grade, record.issue_date, record.father_name, record.extra_info]
+                );
+                inserted++;
+            }
         }
 
         const msg = `Upload complete: ${inserted} record(s) processed` + (skipped ? `, ${skipped} row(s) skipped (missing roll number).` : '.');

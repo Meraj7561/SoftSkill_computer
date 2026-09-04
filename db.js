@@ -301,12 +301,14 @@ if (useJsonFallback) {
       courses: Array.isArray(obj.courses) ? [...obj.courses] : [],
       certificates: Array.isArray(obj.certificates) ? [...obj.certificates] : [],
       contact_messages: Array.isArray(obj.contact_messages) ? [...obj.contact_messages] : [],
+      settings: Array.isArray(obj.settings) ? [...obj.settings] : [],
     };
     const sortById = (a, b) => (Number(a.id) || 0) - (Number(b.id) || 0);
     clone.admins.sort(sortById);
     clone.courses.sort(sortById);
     clone.certificates.sort(sortById);
     clone.contact_messages.sort(sortById);
+    clone.settings.sort((a, b) => String(a.setting_key).localeCompare(String(b.setting_key)));
     return JSON.stringify(clone);
   };
 
@@ -368,6 +370,13 @@ if (useJsonFallback) {
     return Array.from(map.values()).sort((a, b) => Number(a.id) - Number(b.id));
   };
 
+  const mergeSettings = (remoteSettings = [], localSettings = []) => {
+    const map = new Map();
+    for (const item of remoteSettings) map.set(String(item.setting_key), item);
+    for (const item of localSettings) map.set(String(item.setting_key), item);
+    return Array.from(map.values()).sort((a, b) => String(a.setting_key).localeCompare(String(b.setting_key)));
+  };
+
   const mergeRemoteIntoLocal = (remote, local) => {
     if (!remote) return local;
     const out = {};
@@ -375,6 +384,7 @@ if (useJsonFallback) {
     out.courses = mergeCollections(remote.courses || [], local.courses || []);
     out.certificates = mergeCollections(remote.certificates || [], local.certificates || []);
     out.contact_messages = mergeCollections(remote.contact_messages || [], local.contact_messages || []);
+    out.settings = mergeSettings(remote.settings || [], local.settings || []);
     return out;
   };
 
@@ -387,6 +397,32 @@ if (useJsonFallback) {
       console.error('Remote JSON blob save failed after retries:', err.message);
       // leave local cache in place so future instances can recover
     }
+  };
+
+  const bulkUpsertCertificates = async (records) => {
+    const data = await loadJsonState();
+    const byRollNo = new Map(data.certificates.map((item) => [String(item.roll_no), item]));
+    let inserted = 0;
+
+    for (const record of records) {
+      const existing = byRollNo.get(String(record.roll_no));
+      if (existing) {
+        Object.assign(existing, record, { updated_at: nowString() });
+      } else {
+        const row = {
+          id: data.certificates.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1,
+          ...record,
+          created_at: nowString(),
+          updated_at: nowString(),
+        };
+        data.certificates.push(row);
+        byRollNo.set(String(row.roll_no), row);
+      }
+      inserted++;
+    }
+
+    await saveData(data);
+    return inserted;
   };
 
   const query = async (sql, params = []) => {
@@ -677,7 +713,7 @@ if (useJsonFallback) {
     return [[], []];
   };
 
-  module.exports = { query };
+  module.exports = { query, bulkUpsertCertificates };
   module.exports.__jsonFallback = true;
 } else {
   let pool = global.__softskillPool;
