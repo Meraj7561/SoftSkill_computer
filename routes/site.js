@@ -49,11 +49,28 @@ router.get('/', async (req, res) => {
             renderCourseCards,
             announcement,
             apiBaseUrl: process.env.PUBLIC_API_URL || '',
+            siteUrl: (process.env.PUBLIC_SITE_URL || 'https://softskill-node.vercel.app').replace(/\/$/, ''),
         });
     } catch (err) {
         console.error('Homepage error:', err && err.stack ? err.stack : err, 'db.__jsonFallback=', pool && pool.__jsonFallback);
         res.status(500).send('Something went wrong loading the page. Please check the database connection.');
     }
+});
+
+router.get('/robots.txt', (req, res) => {
+        const siteUrl = (process.env.PUBLIC_SITE_URL || 'https://softskill-node.vercel.app').replace(/\/$/, '');
+        res.type('text/plain').send(`User-agent: *\nAllow: /\nSitemap: ${siteUrl}/sitemap.xml\n`);
+});
+
+router.get('/sitemap.xml', (req, res) => {
+        const siteUrl = (process.env.PUBLIC_SITE_URL || 'https://softskill-node.vercel.app').replace(/\/$/, '');
+        res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url><loc>${siteUrl}/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+    <url><loc>${siteUrl}/#courses</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+    <url><loc>${siteUrl}/#verify</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+    <url><loc>${siteUrl}/#contact</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+</urlset>`);
 });
 
 module.exports = router;
