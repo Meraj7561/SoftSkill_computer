@@ -5,6 +5,16 @@
 const apiBaseUrl = (window.SOFTSKILL_API_URL || '').replace(/\/$/, '');
 const apiUrl = (path) => `${apiBaseUrl}${path}`;
 
+const announcementText = document.getElementById('announcementText');
+if (announcementText) {
+    fetch(apiUrl('/api/announcement'))
+        .then((response) => response.json())
+        .then((result) => {
+            if (result.announcement) announcementText.textContent = result.announcement;
+        })
+        .catch(() => {});
+}
+
 const contactForm = document.getElementById('contactForm');
 const contactFormMsg = document.getElementById('contactFormMsg');
 

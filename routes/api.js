@@ -2,6 +2,22 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 
+const DEFAULT_ANNOUNCEMENT = 'New batch starting soon! Limited seats available • Enroll now and get 20% discount • 100% Job Assistance guaranteed.';
+
+router.get('/announcement', async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            'SELECT value FROM settings WHERE setting_key = ? LIMIT 1',
+            ['announcement']
+        );
+        const row = Array.isArray(rows) ? rows[0] : rows;
+        res.json({ announcement: row && row.value ? row.value : DEFAULT_ANNOUNCEMENT });
+    } catch (err) {
+        console.error('Announcement API error:', err);
+        res.json({ announcement: DEFAULT_ANNOUNCEMENT });
+    }
+});
+
 // ---------------------------------------------------------------------
 // POST /api/contact
 // Saves the enquiry, then returns a WhatsApp deep-link so the front-end
