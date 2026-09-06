@@ -14,7 +14,7 @@ console.log('DB_HOST:', process.env.DB_HOST || '(missing!)');
 console.log('DB_NAME:', process.env.DB_NAME || '(missing!)');
 console.log('DB_USER:', process.env.DB_USER || '(missing!)');
 console.log('DB_PASS set:', process.env.DB_PASS !== undefined && process.env.DB_PASS !== '' ? 'yes' : '(empty - ok if your MySQL root has no password)');
-console.log('USE_JSON_FALLBACK:', process.env.VERCEL === '1' && (!process.env.DB_HOST || process.env.DB_HOST === 'localhost' || process.env.DB_HOST === '127.0.0.1'));
+console.log('USE_JSON_FALLBACK:', Boolean(process.env.VERCEL) || process.env.USE_JSON_FALLBACK === 'true');
 console.log('JSONBLOB_ID:', process.env.JSONBLOB_ID || '(default remote blob id)');
 console.log('---------------------------------------');
 

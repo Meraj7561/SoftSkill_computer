@@ -177,11 +177,17 @@ body {
 .mobile-menu-btn {
     display: none;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 5px;
     background: none;
     border: none;
     cursor: pointer;
-    padding: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    position: relative;
+    z-index: 1200;
 }
 
 .mobile-menu-btn span {
@@ -1135,6 +1141,14 @@ section {
 
 /* Responsive */
 @media (max-width: 968px) {
+    .nav-content {
+        gap: 12px;
+    }
+
+    .social-icons {
+        display: none;
+    }
+
     .nav-links {
         display: none;
     }
@@ -1196,6 +1210,7 @@ section {
         padding: 18px 20px 24px;
         z-index: 1100;
         text-align: center;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
     }
 
     .nav-links.active .nav-link {
@@ -1220,7 +1235,7 @@ section {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.35);
-    z-index: 1000;
+    z-index: 900;
 }
 
 @media (max-width: 640px) {

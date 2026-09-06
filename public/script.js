@@ -101,6 +101,10 @@ if (mobileMenuBtn) {
         else openMobileMenu();
     });
 
+    navLinksContainer?.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+
     // close on Esc
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeMobileMenu();
