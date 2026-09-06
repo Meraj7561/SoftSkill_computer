@@ -8,7 +8,11 @@ const jsonBlobId = process.env.JSONBLOB_ID || '019fa08f-1926-73c7-8910-ef35f1496
 const useJsonFallback = isVercel || process.env.USE_JSON_FALLBACK === 'true';
 
 const nowString = () => new Date().toISOString().slice(0, 19).replace('T', ' ');
-const cacheDir = path.join(require('os').tmpdir(), 'softskill-node');
+const os = require('os');
+const configuredDataDir = process.env.DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT_PATH;
+const cacheDir = isVercel
+  ? path.join(os.tmpdir(), 'softskill-node')
+  : path.resolve(configuredDataDir || path.join(process.cwd(), 'data'));
 const cacheFile = path.join(cacheDir, 'softskill-db.json');
 const jsonBlobPath = `/api/jsonBlob/${jsonBlobId}`;
 
